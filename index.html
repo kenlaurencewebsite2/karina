@@ -1961,6 +1961,11 @@
       }
     }
 
+    .video-memory.dissolving {
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      pointer-events: none !important;
+    }
+
     .bee-carrier {
       position: absolute;
       top: 50%;
@@ -3485,6 +3490,7 @@
         }, 1200);
       }
 
+      // ===== UPDATED: closeLightbox now removes the specific memory completely =====
       function closeLightbox() {
         lightbox.classList.remove('open');
         setTimeout(function() {
@@ -3494,7 +3500,34 @@
           lightboxImage.removeAttribute('src');
         }, 400);
 
-        if (!heartModeActive) {
+        if (currentLightboxIndex >= 0) {
+          const entry = activeVideos.get(currentLightboxIndex);
+          if (entry) {
+            const videoEl = entry.el;
+            if (entry.cancelFlight) entry.cancelFlight();
+            videoEl.classList.add('dissolving');
+            videoEl.style.transition = 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            videoEl.style.opacity = '0';
+            videoEl.style.transform = 'scale(0.2) rotate(360deg) translateY(-80px)';
+            videoEl.style.pointerEvents = 'none';
+
+            setTimeout(function() {
+              if (videoEl.parentNode) {
+                videoEl.parentNode.removeChild(videoEl);
+              }
+              activeVideos.delete(currentLightboxIndex);
+
+              // If all memories are gone, transform box into heart
+              if (activeVideos.size === 0 && !heartModeActive && giftOpened) {
+                setTimeout(function() {
+                  transformBoxIntoHeart();
+                }, 1200);
+              }
+            }, 900);
+          }
+        }
+
+        if (!heartModeActive && activeVideos.size > 0) {
           if (!window._remindInterval) {
             window._remindInterval = setInterval(function() {
               if (lightbox.classList.contains('open')) return;
@@ -3506,6 +3539,7 @@
             }, 8000);
           }
         }
+
         currentLightboxIndex = -1;
       }
 
@@ -4031,7 +4065,7 @@
         });
 
         setTimeout(function() {
-          if (videoEl.classList.contains('returning')) return;
+          if (videoEl.classList.contains('returning') || videoEl.classList.contains('dissolving')) return;
 
           const rect = videoEl.getBoundingClientRect();
           videoEl.style.transition = 'none';
@@ -4056,6 +4090,7 @@
           function flyLoop(now) {
             if (!running) return;
             if (videoEl.classList.contains('returning')) return;
+            if (videoEl.classList.contains('dissolving')) return;
 
             const elapsed = (now - startTime) / 1000;
             const t = elapsed / flyDuration * Math.PI * 2;

@@ -161,36 +161,30 @@
       letter-spacing: 1px;
     }
 
+    /* ===== CAT WALKER – NOW FIXED CENTER, NO DRAG ===== */
     .cat-walker {
       position: fixed;
-      bottom: 20px;
-      left: 50px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 9999;
       pointer-events: none;
-      touch-action: none;
+      touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-50px) scale(0.5);
       transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .cat-walker.visible {
       opacity: 1;
       visibility: visible;
-      transform: translateY(0) scale(1);
+      transform: translate(-50%, -50%) scale(1);
     }
 
-    .cat-walker.center-appear {
-      bottom: auto;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .cat-walker.center-appear.visible {
-      transform: translate(-50%, -50%);
+    .cat-walker.falling {
+      transition: none !important;
     }
 
     .cat-pet-container {
@@ -199,20 +193,16 @@
       flex-direction: column;
       align-items: center;
       pointer-events: auto;
-      cursor: grab;
-      touch-action: none;
+      cursor: pointer;
+      touch-action: manipulation;
       transform-origin: center bottom;
       transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
-    .cat-pet-container.dragging { cursor: grabbing; }
 
     .cat-pet-container.big {
       transform: scale(var(--cat-big-scale, 2.2));
       z-index: 10000;
     }
-
-    .cat-walker.falling { transition: none !important; }
 
     .cat-speech {
       background: linear-gradient(145deg, #1a3a1a, #0f2a0f);
@@ -2738,8 +2728,34 @@
       50% { transform: translateX(-50%) scale(0.8); opacity: 0.3; }
     }
 
-    .cat-pet-container.dragging .cat-3d {
-      filter: drop-shadow(0 0 25px rgba(120, 255, 150, 0.8)) drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+    .cat-tap-hint {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(145deg, #ff4d6d, #c9184a);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(0.55rem, 2vw, 0.7rem);
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 100, 150, 0.85);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      animation: hintPulse 1.5s ease-in-out infinite;
+      z-index: 50;
+    }
+
+    .cat-pet-container:not(.big):not(.heart-mode) .cat-tap-hint {
+      opacity: 1;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.08); }
     }
 
     .curtain-flower {
@@ -2787,29 +2803,6 @@
       }
     }
 
-    .cat-catching {
-      position: fixed !important;
-      z-index: 1000002 !important;
-      pointer-events: none !important;
-    }
-
-    .cat-catching .cat-pet-container {
-      animation: catchStretch 0.6s ease-in-out !important;
-    }
-
-    @keyframes catchStretch {
-      0% { transform: scaleX(1) scaleY(1); }
-      30% { transform: scaleX(1.2) scaleY(0.85); }
-      60% { transform: scaleX(0.95) scaleY(1.1); }
-      100% { transform: scaleX(1) scaleY(1); }
-    }
-
-    .video-being-caught {
-      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-      z-index: 1000001 !important;
-      pointer-events: none !important;
-    }
-
     @media (max-width: 1024px) {
       .cat-pet-container.big { --cat-big-scale: 2; }
     }
@@ -2836,7 +2829,6 @@
     @media (max-width: 480px) {
       .content { padding: 1rem 0.6rem; }
       .section { padding: 1.5rem 1rem; margin: 5vh 0; border-radius: 24px 8px 24px 8px; }
-      .cat-walker { bottom: 12px; left: 15px; }
       .cat-pet-container.big { --cat-big-scale: 1.5; }
       .cat-pet-container.big .cat-speech {
         font-size: 0.5rem;
@@ -2846,7 +2838,6 @@
     }
 
     @media (max-width: 360px) {
-      .cat-walker { bottom: 8px; left: 10px; }
       .cat-pet-container.big { --cat-big-scale: 1.35; }
       .cat-pet-container.big .cat-speech {
         font-size: 0.45rem;
@@ -2873,36 +2864,6 @@
     @media (hover: none) and (pointer: coarse) {
       .cat-pet-container { padding: 8px; }
       .cat-speech { padding: 10px 14px; }
-    }
-
-    .cat-tap-hint {
-      position: absolute;
-      bottom: -28px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(145deg, #ff4d6d, #c9184a);
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 16px;
-      font-family: 'Poppins', sans-serif;
-      font-size: clamp(0.55rem, 2vw, 0.7rem);
-      font-weight: 700;
-      white-space: nowrap;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 100, 150, 0.85);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-      animation: hintPulse 1.5s ease-in-out infinite;
-      z-index: 50;
-    }
-
-    .cat-pet-container:not(.big):not(.heart-mode):not(.dragging) .cat-tap-hint {
-      opacity: 1;
-    }
-
-    @keyframes hintPulse {
-      0%, 100% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.08); }
     }
   </style>
 </head>
@@ -2994,8 +2955,6 @@
           <path d="M16 29s-13-8.35-13-17.5C3 6.5 6.5 3 10.5 3c2.5 0 4.5 1.5 5.5 3.5C17 4.5 19 3 21.5 3 25.5 3 29 6.5 29 11.5 29 20.65 16 29 16 29z" fill="url(#heartShine)"/>
         </svg>
       </div>
-
-      <div class="explosion-burst" id="explosionBurst"></div>
 
       <div class="impact-dust"></div>
 
@@ -3144,7 +3103,6 @@
       const pet = document.getElementById('catPet');
       const speech = document.getElementById('catSpeech');
       const giftBox = document.getElementById('giftBox');
-      const explosionBurst = document.getElementById('explosionBurst');
       const heartShape = document.getElementById('heartShape');
       const catTapHint = document.getElementById('catTapHint');
 
@@ -3174,22 +3132,11 @@
       const bookMusic = document.getElementById('storybookMusic');
 
       let currentLightboxIndex = -1;
-
-      let posX = 0;
-      let posY = 0;
-      let isDragging = false;
-      let hasBeenDragged = false;
-      let isBig = false;
       let isVisible = false;
       let isIntroFalling = false;
       let giftOpened = false;
       let heartModeActive = false;
-      let isCatCatching = false;
-
-      let dragStartX = 0;
-      let dragStartY = 0;
-      let dragOffsetX = 0;
-      let dragOffsetY = 0;
+      let isBig = false;
 
       const activeVideos = new Map();
 
@@ -3318,15 +3265,6 @@
         if (isVisible) return;
         isVisible = true;
 
-        const catWidth = walker.offsetWidth;
-        const catHeight = walker.offsetHeight;
-        posX = (window.innerWidth / 2) - (catWidth / 2);
-        posY = (window.innerHeight / 2) - (catHeight / 2);
-
-        walker.style.left = posX + 'px';
-        walker.style.top = posY + 'px';
-        walker.style.bottom = 'auto';
-
         walker.classList.add('visible');
         isIntroFalling = true;
         walker.classList.add('falling');
@@ -3346,7 +3284,7 @@
             startDancing();
 
             setTimeout(function() {
-              if (!isBig && !isDragging && !heartModeActive) {
+              if (!isBig && !heartModeActive) {
                 speech.innerHTML = 'ПРИВЕТ <span class="highlight">KARINA</span><br>Не могли бы вы, пожалуйста...<br><span class="highlight">Нажми на меня</span> 💚';
               }
             }, 4000);
@@ -3548,176 +3486,7 @@
         }, 1200);
       }
 
-      function catCatchAndReturn(videoEl, index) {
-        if (isCatCatching) {
-          sendSingleVideoHomeDirect(index);
-          return;
-        }
-        isCatCatching = true;
-
-        const entry = activeVideos.get(index);
-        if (!entry) {
-          isCatCatching = false;
-          return;
-        }
-
-        if (entry.cancelFlight) entry.cancelFlight();
-        videoEl.classList.remove('returning');
-
-        const videoRect = videoEl.getBoundingClientRect();
-        const videoCenterX = videoRect.left + videoRect.width / 2;
-        const videoCenterY = videoRect.top + videoRect.height / 2;
-
-        const giftRect = giftBox.getBoundingClientRect();
-        const giftCenterX = giftRect.left + giftRect.width / 2;
-        const giftCenterY = giftRect.top + giftRect.height / 2;
-
-        const catRect = walker.getBoundingClientRect();
-        const catWidth = catRect.width;
-        const catHeight = catRect.height;
-
-        const centerX = window.innerWidth / 2 - catWidth / 2;
-        const centerY = window.innerHeight / 2 - catHeight / 2;
-
-        videoEl.style.transition = 'none';
-        videoEl.style.left = videoRect.left + 'px';
-        videoEl.style.top = videoRect.top + 'px';
-        videoEl.style.transform = 'scale(1) rotate(0deg)';
-        videoEl.style.transformOrigin = 'center center';
-        videoEl.style.zIndex = '1000001';
-        videoEl.classList.add('video-being-caught');
-
-        walker.classList.add('cat-catching');
-        walker.style.transition = 'left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        walker.style.left = (videoCenterX - catWidth / 2) + 'px';
-        walker.style.top = (videoCenterY - catHeight / 2) + 'px';
-        walker.style.bottom = 'auto';
-
-        speech.classList.add('show');
-        speech.innerHTML = '💚 Я ПОЙМАЮ ЭТО<br><span class="highlight">ВОСПОМИНАНИЕ</span>! 🐾<br>ДЕРЖИСЬ! ✨';
-
-        setTimeout(function() {
-          pet.classList.add('catch-stretch');
-
-          videoEl.style.transition = 'all 0.3s ease-out';
-          videoEl.style.transform = 'scale(0.6) rotate(15deg)';
-          videoEl.style.opacity = '0.9';
-
-          speech.innerHTML = '🐾 ПОЙМАЛ! 💚<br>НЕСУ ЭТО ОБРАТНО<br>В <span class="highlight">КОРОБКУ</span>! 🎁';
-
-          setTimeout(function() {
-            walker.style.transition = 'left 1s cubic-bezier(0.34, 1.56, 0.64, 1), top 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            walker.style.left = (giftCenterX - catWidth / 2) + 'px';
-            walker.style.top = (giftCenterY - catHeight / 2) + 'px';
-
-            videoEl.style.transition = 'all 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            videoEl.style.left = (giftCenterX - 30) + 'px';
-            videoEl.style.top = (giftCenterY - 30) + 'px';
-            videoEl.style.transform = 'scale(0.2) rotate(720deg)';
-            videoEl.style.opacity = '0.5';
-
-            setTimeout(function() {
-              giftBox.classList.add('receiving');
-
-              videoEl.style.transition = 'all 0.5s ease-in';
-              videoEl.style.transform = 'scale(0) rotate(1080deg)';
-              videoEl.style.opacity = '0';
-
-              speech.innerHTML = '💚 ВОСПОМИНАНИЕ В БЕЗОПАСНОСТИ!<br><span class="highlight">ВСЁ В ПОРЯДКЕ</span>! 🎁✨';
-
-              setTimeout(function() {
-                if (videoEl.parentNode) {
-                  videoEl.parentNode.removeChild(videoEl);
-                }
-                activeVideos.delete(index);
-
-                giftBox.classList.remove('receiving');
-                pet.classList.remove('catch-stretch');
-
-                walker.classList.add('impact');
-                setTimeout(function() { walker.classList.remove('impact'); }, 500);
-
-                walker.style.transition = 'left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                walker.style.left = centerX + 'px';
-                walker.style.top = centerY + 'px';
-                walker.style.bottom = 'auto';
-
-                speech.innerHTML = '💚 ОБРАТНО В<br><span class="highlight">ЦЕНТР</span>! 🐾<br>ВСЁ В ПОРЯДКЕ! ✨';
-
-                setTimeout(function() {
-                  walker.classList.remove('cat-catching');
-                  walker.style.transition = '';
-                  walker.style.left = centerX + 'px';
-                  walker.style.top = centerY + 'px';
-                  walker.style.bottom = 'auto';
-
-                  posX = centerX;
-                  posY = centerY;
-
-                  startDancing();
-
-                  if (activeVideos.size > 0) {
-                    speech.innerHTML = '💚 ВОСПОМИНАНИЕ В БЕЗОПАСНОСТИ!<br><span class="highlight">НАЖМИ НА ДРУГОЕ</span><br>ВИДЕО 📽️✨';
-
-                    setTimeout(function() {
-                      if (!heartModeActive) {
-                        speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
-                      }
-                    }, 3500);
-                  } else {
-                    speech.innerHTML = '💚 ВСЕ ВОСПОМИНАНИЯ<br>В БЕЗОПАСНОСТИ!<br><span class="highlight">СМОТРИ, ЧТО БУДЕТ</span> ✨🎁';
-
-                    setTimeout(function() {
-                      transformBoxIntoHeart();
-                    }, 2500);
-                  }
-
-                  isCatCatching = false;
-                }, 1300);
-              }, 500);
-            }, 1000);
-          }, 400);
-        }, 900);
-      }
-
-      function sendSingleVideoHomeDirect(index) {
-        const entry = activeVideos.get(index);
-        if (!entry) return;
-
-        const videoEl = entry.el;
-        if (entry.cancelFlight) entry.cancelFlight();
-        videoEl.classList.add('returning');
-
-        const giftRect = giftBox.getBoundingClientRect();
-        const giftCenterX = giftRect.left + giftRect.width / 2;
-        const giftCenterY = giftRect.top + giftRect.height / 2;
-
-        videoEl.style.transition = 'none';
-        videoEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
-        videoEl.style.opacity = '1';
-        void videoEl.offsetWidth;
-
-        videoEl.style.transition = 'left 1.2s cubic-bezier(0.5, 0, 0.75, 0), top 1.2s cubic-bezier(0.5, 0, 0.75, 0), transform 1.2s cubic-bezier(0.5, 0, 0.75, 0), opacity 1.2s ease-in 0.7s';
-        videoEl.style.left = (giftCenterX - 20) + 'px';
-        videoEl.style.top = (giftCenterY - 20) + 'px';
-        videoEl.style.transform = 'translate(0, 0) scale(0.05) rotate(720deg)';
-        videoEl.style.opacity = '0';
-
-        setTimeout(function() {
-          if (videoEl.parentNode) {
-            videoEl.parentNode.removeChild(videoEl);
-          }
-          activeVideos.delete(index);
-
-          if (activeVideos.size === 0 && !heartModeActive && giftOpened) {
-            setTimeout(function() {
-              transformBoxIntoHeart();
-            }, 1500);
-          }
-        }, 1400);
-      }
-
-      function closeLightbox(sendHome) {
+      function closeLightbox() {
         lightbox.classList.remove('open');
         setTimeout(function() {
           lightboxVideo.pause();
@@ -3726,23 +3495,16 @@
           lightboxImage.removeAttribute('src');
         }, 400);
 
-        if (sendHome && currentLightboxIndex >= 0) {
-          const entry = activeVideos.get(currentLightboxIndex);
-          if (entry) {
-            catCatchAndReturn(entry.el, currentLightboxIndex);
-          }
-        } else {
-          if (!heartModeActive) {
-            if (!window._remindInterval) {
-              window._remindInterval = setInterval(function() {
-                if (lightbox.classList.contains('open')) return;
-                if (heartModeActive) return;
-                if (!speech.classList.contains('show')) {
-                  speech.classList.add('show');
-                }
-                speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
-              }, 8000);
-            }
+        if (!heartModeActive) {
+          if (!window._remindInterval) {
+            window._remindInterval = setInterval(function() {
+              if (lightbox.classList.contains('open')) return;
+              if (heartModeActive) return;
+              if (!speech.classList.contains('show')) {
+                speech.classList.add('show');
+              }
+              speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
+            }, 8000);
           }
         }
         currentLightboxIndex = -1;
@@ -4057,7 +3819,7 @@
 
       lightboxClose.addEventListener('click', function(e) {
         e.stopPropagation();
-        closeLightbox(true);
+        closeLightbox();
       });
       lightboxPrev.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -4068,7 +3830,7 @@
         showNextVideo();
       });
       lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) closeLightbox(false);
+        if (e.target === lightbox) closeLightbox();
       });
 
       bookClose.addEventListener('click', function(e) {
@@ -4109,7 +3871,7 @@
         if (loveLetterModal.classList.contains('open')) {
           if (e.key === 'Escape') closeLoveLetter();
         } else if (lightbox.classList.contains('open')) {
-          if (e.key === 'Escape') closeLightbox(false);
+          if (e.key === 'Escape') closeLightbox();
           if (e.key === 'ArrowRight') showNextVideo();
           if (e.key === 'ArrowLeft') showPrevVideo();
         } else if (storybookOverlay.classList.contains('open')) {
@@ -4296,7 +4058,6 @@
           function flyLoop(now) {
             if (!running) return;
             if (videoEl.classList.contains('returning')) return;
-            if (videoEl.classList.contains('video-being-caught')) return;
 
             const elapsed = (now - startTime) / 1000;
             const t = elapsed / flyDuration * Math.PI * 2;
@@ -4316,141 +4077,36 @@
         }, 2000);
       }
 
-      function getEventPoint(e) {
-        if (e.touches && e.touches.length > 0) {
-          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        return { x: e.clientX, y: e.clientY };
+      // ========== SIMPLE TAP / CLICK HANDLER (NO DRAG) ==========
+      let lastTapTime = 0;
+
+      function handleCatTap(e) {
+        if (isIntroFalling || !isVisible || heartModeActive || isBig) return;
+
+        const now = Date.now();
+        if (now - lastTapTime < 300) return; // prevent double-tap
+        lastTapTime = now;
+
+        e.stopPropagation();
+        if (e.cancelable) e.preventDefault();
+
+        showGiftOnly();
       }
 
-      function onPointerDown(e) {
-        if (isIntroFalling || !isVisible) return;
-        if (!pet.contains(e.target) && e.target !== pet) return;
-        if (heartModeActive || isCatCatching) return;
-
-        isDragging = true;
-        hasBeenDragged = true;
-        pet.classList.add('dragging');
-
-        if (!isBig) stopDancing();
-
-        const rect = walker.getBoundingClientRect();
-        const point = getEventPoint(e);
-        dragStartX = point.x;
-        dragStartY = point.y;
-        dragOffsetX = dragStartX - rect.left;
-        dragOffsetY = dragStartY - rect.top;
-
-        if (!isBig) speech.classList.remove('show');
-
-        e.preventDefault();
-      }
-
-      function onPointerMove(e) {
-        if (!isDragging || isIntroFalling || isCatCatching) return;
-
-        const point = getEventPoint(e);
-        let newX = point.x - dragOffsetX;
-        let newY = point.y - dragOffsetY;
-
-        const maxX = window.innerWidth - walker.offsetWidth;
-        const maxY = window.innerHeight - walker.offsetHeight;
-
-        newX = Math.max(0, Math.min(newX, maxX));
-        newY = Math.max(0, Math.min(newY, maxY));
-
-        posX = newX;
-        posY = newY;
-
-        walker.style.left = posX + 'px';
-        walker.style.top = posY + 'px';
-        walker.style.bottom = 'auto';
-
-        e.preventDefault();
-      }
-
-      function onPointerUp(e) {
-        if (!isDragging) return;
-
-        isDragging = false;
-        pet.classList.remove('dragging');
-
-        if (!isBig && !isIntroFalling && !heartModeActive && !isCatCatching) {
-          speech.classList.add('show');
-          speech.innerHTML = 'УРА! 🐾<br>ТЫ ПЕРЕМЕСТИЛА МЕНЯ!<br><span class="highlight">ТАК ВЕСЕЛО!</span>';
-
-          setTimeout(function() {
-            speech.classList.remove('show');
-            speech.innerHTML = 'ПРИВЕТ <span class="highlight">KARINA</span><br>Не могли бы вы, пожалуйста...<br><span class="highlight">Нажми на меня</span> 💚';
-          }, 2500);
-
-          setTimeout(function() {
-            hasBeenDragged = false;
-            startDancing();
-          }, 1200);
-        } else {
-          hasBeenDragged = false;
-        }
-      }
-
-      pet.addEventListener('mousedown', onPointerDown);
-      window.addEventListener('mousemove', onPointerMove);
-      window.addEventListener('mouseup', onPointerUp);
-
-      pet.addEventListener('touchstart', onPointerDown, { passive: false });
-      window.addEventListener('touchmove', onPointerMove, { passive: false });
-      window.addEventListener('touchend', onPointerUp);
-      window.addEventListener('touchcancel', onPointerUp);
-
-      let dragMoved = false;
-      pet.addEventListener('mousedown', function() { dragMoved = false; });
-      pet.addEventListener('mousemove', function() { if (isDragging) dragMoved = true; });
-      pet.addEventListener('touchstart', function() { dragMoved = false; });
-      pet.addEventListener('touchmove', function() { if (isDragging) dragMoved = true; });
-
-      // ========== FIXED: Mobile tap detection ==========
-      let touchStartTime = 0;
-      let touchStartX = 0;
-      let touchStartY = 0;
-      let touchMoved = false;
-
-      pet.addEventListener('touchstart', function(e) {
-        touchStartTime = Date.now();
-        const t = e.touches[0];
-        touchStartX = t.clientX;
-        touchStartY = t.clientY;
-        touchMoved = false;
-      }, { passive: true });
-
-      pet.addEventListener('touchmove', function(e) {
-        const t = e.touches[0];
-        const dx = Math.abs(t.clientX - touchStartX);
-        const dy = Math.abs(t.clientY - touchStartY);
-        if (dx > 10 || dy > 10) touchMoved = true;
-      }, { passive: true });
+      pet.addEventListener('click', function(e) {
+        e.stopPropagation();
+        handleCatTap(e);
+      });
 
       pet.addEventListener('touchend', function(e) {
-        const touchDuration = Date.now() - touchStartTime;
-        if (touchMoved || touchDuration > 400) return;
-        if (isDragging || isIntroFalling || !isVisible || isCatCatching || heartModeActive) return;
         e.stopPropagation();
         e.preventDefault();
-
-        if (!isBig && !heartModeActive) {
-          showGiftOnly();
-        }
+        handleCatTap(e);
       }, { passive: false });
 
-      // Click handler for desktop
-      pet.addEventListener('click', function(e) {
-        if (dragMoved || isDragging || isIntroFalling || !isVisible || isCatCatching) return;
-        // Only respond to real mouse clicks, not synthesized
-        if (e.detail === 0) return;
-        e.stopPropagation();
-
-        if (!isBig && !heartModeActive) {
-          showGiftOnly();
-        }
+      // Prevent context menu on long press
+      pet.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
       });
 
       giftBox.addEventListener('click', function(e) {
@@ -4468,33 +4124,14 @@
         }
       }, { passive: false });
 
-      pet.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-      });
-
-      walker.classList.add('center-appear');
       flipper.classList.add('facing-right');
 
       window.addEventListener('resize', function() {
-        if (!isVisible || isIntroFalling || isCatCatching) return;
-        const maxX = window.innerWidth - walker.offsetWidth;
-        const maxY = window.innerHeight - walker.offsetHeight;
-        if (posX > maxX) posX = maxX;
-        if (posY > maxY) posY = maxY;
-        walker.style.left = posX + 'px';
-        walker.style.top = posY + 'px';
+        // cat stays centered, nothing to do
       });
 
       window.addEventListener('orientationchange', function() {
-        setTimeout(function() {
-          if (!isVisible || isIntroFalling || isCatCatching) return;
-          const maxX = window.innerWidth - walker.offsetWidth;
-          const maxY = window.innerHeight - walker.offsetHeight;
-          if (posX > maxX) posX = maxX;
-          if (posY > maxY) posY = maxY;
-          walker.style.left = posX + 'px';
-          walker.style.top = posY + 'px';
-        }, 300);
+        // cat stays centered, nothing to do
       });
 
     })();

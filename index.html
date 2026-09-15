@@ -161,7 +161,7 @@
       letter-spacing: 1px;
     }
 
-    /* ===== CAT WALKER – NOW FIXED CENTER, NO DRAG ===== */
+    /* ===== CAT WALKER – FIXED CENTER, NO DRAG ===== */
     .cat-walker {
       position: fixed;
       top: 50%;
@@ -3127,7 +3127,6 @@
 
       const loveLetterModal = document.getElementById('loveLetterModal');
       const letterClose = document.getElementById('letterClose');
-      const letterCard = document.getElementById('letterCard');
 
       const bookMusic = document.getElementById('storybookMusic');
 
@@ -3601,7 +3600,6 @@
 
       function renderStoryPages() {
         const page = STORY_PAGES[currentStoryPage];
-        const isLastPage = currentStoryPage === STORY_PAGES.length - 1;
         const isEnvelopePage = page.isEnvelopePage === true;
 
         leftPageContent.innerHTML = `
@@ -4084,7 +4082,7 @@
         if (isIntroFalling || !isVisible || heartModeActive || isBig) return;
 
         const now = Date.now();
-        if (now - lastTapTime < 300) return; // prevent double-tap
+        if (now - lastTapTime < 300) return;
         lastTapTime = now;
 
         e.stopPropagation();
@@ -4104,7 +4102,6 @@
         handleCatTap(e);
       }, { passive: false });
 
-      // Prevent context menu on long press
       pet.addEventListener('contextmenu', function(e) {
         e.preventDefault();
       });
@@ -4125,14 +4122,6 @@
       }, { passive: false });
 
       flipper.classList.add('facing-right');
-
-      window.addEventListener('resize', function() {
-        // cat stays centered, nothing to do
-      });
-
-      window.addEventListener('orientationchange', function() {
-        // cat stays centered, nothing to do
-      });
 
     })();
   </script>

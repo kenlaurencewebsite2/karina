@@ -2874,6 +2874,36 @@
       .cat-pet-container { padding: 8px; }
       .cat-speech { padding: 10px 14px; }
     }
+
+    .cat-tap-hint {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(145deg, #ff4d6d, #c9184a);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(0.55rem, 2vw, 0.7rem);
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 100, 150, 0.85);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      animation: hintPulse 1.5s ease-in-out infinite;
+      z-index: 50;
+    }
+
+    .cat-pet-container:not(.big):not(.heart-mode):not(.dragging) .cat-tap-hint {
+      opacity: 1;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.08); }
+    }
   </style>
 </head>
 <body>
@@ -2999,6 +3029,8 @@
           </div>
         </div>
       </div>
+
+      <div class="cat-tap-hint" id="catTapHint">👆 НАЖМИ НА МЕНЯ 👆</div>
     </div>
   </div>
 
@@ -3024,59 +3056,16 @@
       <span class="rose r6">🌹</span>
 
       <div class="letter-heart-top">💖</div>
-      <div class="letter-to">Моей дорогой Карине,</div>
-      <div class="letter-title">Моё последнее сообщение для тебя</div>
+      <div class="letter-to">Дорогая Карина,</div>
+      <div class="letter-title">Короткое письмо от сердца</div>
       <div class="letter-divider">❦ ❦ ❦</div>
       <div class="letter-body">
-        <p>Если ты читаешь это, значит, ты дошла до конца нашей маленькой истории — но <span class="love-word">наша история никогда по-настоящему не заканчивается.</span>
-        <span class="letter-body-en">If you're reading this, it means you've reached the end of our little story — but <em>our story never really ends.</em></span></p>
-
-        <p>Спасибо. Спасибо тебе за всё. Даже если мы никогда не встречались лично, даже если наша дружба существовала только в словах и разговорах — я всё равно был счастлив, что встретил тебя.
-        <span class="letter-body-en">Thank you. Thank you for everything. Even though we never met in person, even though our friendship existed only in words and conversations, I was still happy that I met you.</span></p>
-
-        <p>Я гордился тем, что знал такого человека, как ты. На короткое время ты заставила меня почувствовать себя <span class="love-word">особенным.</span> И за это я всегда буду благодарен.
-        <span class="letter-body-en">I was proud to have known someone like you. For a short time, you made me feel <em>special.</em> And for that, I will always be grateful.</span></p>
-
-        <p>Я также хочу попросить прощения. Прости меня за моменты, когда я причинял тебе боль. Прости за мои ошибки. Прости за те времена, когда я не понимал тебя. Я никогда не хотел причинить тебе боль. Я лишь хотел, чтобы ты была счастлива.
-        <span class="letter-body-en">I also want to ask for forgiveness. Forgive me for the moments I hurt you. Forgive me for my mistakes. Forgive me for the times I didn't understand you. I never wanted to hurt you. I only wanted you to be happy.</span></p>
-
-        <p>И, возможно, это было самой трудной частью прощания. Я ухожу не потому, что ненавижу тебя. Я ухожу потому, что иногда человеку нужно уйти от того, что ему действительно дорого, чтобы исправить себя, свою жизнь и двигаться дальше.
-        <span class="letter-body-en">And maybe that was the hardest part of saying goodbye. I'm not leaving because I hate you. I'm leaving because sometimes a person has to walk away from what is truly dear to them, to fix himself, his life, and move forward.</span></p>
-
-        <p>Поэтому моё последнее желание для тебя простое. Я не прошу тебя любить меня. Я не прошу тебя ждать меня. Я не прошу тебя помнить обо мне всю жизнь. Я лишь хочу, чтобы однажды, каким-то образом, ты наконец стала <span class="love-word">счастливой.</span>
-        <span class="letter-body-en">So my last wish for you is simple. I don't ask you to love me. I don't ask you to wait for me. I don't ask you to remember me for the rest of your life. I only want that one day, somehow, you finally become <em>happy.</em></span></p>
-
-        <p>Даже если это счастье больше не будет включать меня. Даже если однажды ты больше никогда со мной не заговоришь. Я всё равно буду благодарен.
-        <span class="letter-body-en">Even if that happiness no longer includes me. Even if one day you never speak to me again. I will still be grateful.</span></p>
-
-        <p>И если когда-нибудь в будущем судьба решит снова свести нас вместе, я просто улыбнусь и скажу: <span class="love-word">Спасибо.</span>
-        <span class="letter-body-en">And if someday in the future fate decides to bring our paths together again, I will simply smile and say: <em>Thank you.</em></span></p>
-
-        <p>Спасибо за то, что однажды появилась на моём пути. Спасибо за наши разговоры. Спасибо за наши воспоминания. Спасибо за то, что позволила мне почувствовать себя особенным, пусть даже всего на короткое время.
-        <span class="letter-body-en">Thank you for once appearing on my path. Thank you for our conversations. Thank you for our memories. Thank you for letting me feel special, even if only for a short time.</span></p>
-
-        <p>И больше всего... спасибо за то, что стала человеком, которого я всегда буду с гордостью вспоминать в своей жизни.
-        <span class="letter-body-en">And most of all... thank you for becoming a person I will always be proud to remember in my life.</span></p>
-
-        <p><span class="love-word">Прощай, Карина Рыльская.</span>
-        <span class="letter-body-en">Goodbye, Karina Rylskaya.</span></p>
-
-        <p>Моя особенная девушка. Моя лучшая девушка. Девушка, которая была для меня словно мечта — мечта, которой я никогда не смог бы достичь.
-        <span class="letter-body-en">My special girl. My best girl. The girl who was like a dream to me — a dream I could never reach.</span></p>
-
-        <p>Возможно, мы родились не в том поколении. Возможно, мы встретились не в той ситуации. Возможно, мы просто были двумя людьми, которым никогда не суждено было стать возлюбленными.
-        <span class="letter-body-en">Maybe we were born in the wrong generation. Maybe we met in the wrong situation. Maybe we were simply two people who were never destined to become lovers.</span></p>
-
-        <p>Но хотя бы на какое-то время Вселенная позволила нам стать <span class="love-word">друзьями.</span> И за это...
-        <span class="letter-body-en">But at least for a while, the Universe let us become <em>friends.</em> And for that...</span></p>
-
-        <p><span class="love-word">Я всегда буду благодарен.</span>
-        <span class="letter-body-en">I will always be grateful.</span></p>
-
-        <p>Прощай, моя особенная и лучшая девушка в моей жизни. Я надеюсь, что куда бы ни привела тебя жизнь, ты наконец найдёшь то счастье, которого всегда заслуживала.
-        <span class="letter-body-en">Goodbye, my special and best girl in my life. I hope that wherever life takes you, you finally find the happiness you always deserved.</span></p>
+        <p>Спасибо тебе за всё. За разговоры, за смех, за моменты, которые я буду бережно хранить. Ты сделала мои дни светлее просто тем, что была рядом — пусть даже на расстоянии.</p>
+        <p>Прости меня за ошибки и за боль, которую я мог тебе причинить. Я никогда не хотел этого. Я всегда хотел только одного — чтобы ты была <span class="love-word">счастлива.</span></p>
+        <p>И если однажды судьба снова сведёт нас, я просто улыбнусь и скажу: <span class="love-word">спасибо.</span> Спасибо за то, что ты была в моей жизни.</p>
+        <p>Береги себя, Карина. Ты заслуживаешь всего самого лучшего. 💚</p>
       </div>
-      <div class="letter-signature">Твоя любовь 💚</div>
+      <div class="letter-signature">С теплом и благодарностью 💚</div>
       <div class="letter-heart-bottom">💖 💕 💖</div>
       <div class="wax-seal">💌</div>
     </div>
@@ -3157,6 +3146,7 @@
       const giftBox = document.getElementById('giftBox');
       const explosionBurst = document.getElementById('explosionBurst');
       const heartShape = document.getElementById('heartShape');
+      const catTapHint = document.getElementById('catTapHint');
 
       const lightbox = document.getElementById('videoLightbox');
       const lightboxVideo = document.getElementById('lightboxVideo');
@@ -4418,8 +4408,44 @@
       pet.addEventListener('touchstart', function() { dragMoved = false; });
       pet.addEventListener('touchmove', function() { if (isDragging) dragMoved = true; });
 
+      // ========== FIXED: Mobile tap detection ==========
+      let touchStartTime = 0;
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchMoved = false;
+
+      pet.addEventListener('touchstart', function(e) {
+        touchStartTime = Date.now();
+        const t = e.touches[0];
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+        touchMoved = false;
+      }, { passive: true });
+
+      pet.addEventListener('touchmove', function(e) {
+        const t = e.touches[0];
+        const dx = Math.abs(t.clientX - touchStartX);
+        const dy = Math.abs(t.clientY - touchStartY);
+        if (dx > 10 || dy > 10) touchMoved = true;
+      }, { passive: true });
+
+      pet.addEventListener('touchend', function(e) {
+        const touchDuration = Date.now() - touchStartTime;
+        if (touchMoved || touchDuration > 400) return;
+        if (isDragging || isIntroFalling || !isVisible || isCatCatching || heartModeActive) return;
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (!isBig && !heartModeActive) {
+          showGiftOnly();
+        }
+      }, { passive: false });
+
+      // Click handler for desktop
       pet.addEventListener('click', function(e) {
         if (dragMoved || isDragging || isIntroFalling || !isVisible || isCatCatching) return;
+        // Only respond to real mouse clicks, not synthesized
+        if (e.detail === 0) return;
         e.stopPropagation();
 
         if (!isBig && !heartModeActive) {

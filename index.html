@@ -161,7 +161,7 @@
       letter-spacing: 1px;
     }
 
-    /* ===== CAT WALKER – FIXED CENTER, NO DRAG ===== */
+    /* ===== CAT WALKER – FIXED CENTER, NO DRAG, BUT CAN MOVE TO CATCH ===== */
     .cat-walker {
       position: fixed;
       top: 50%;
@@ -187,6 +187,10 @@
       transition: none !important;
     }
 
+    .cat-walker.catching {
+      transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+
     .cat-pet-container {
       position: relative;
       display: flex;
@@ -202,6 +206,17 @@
     .cat-pet-container.big {
       transform: scale(var(--cat-big-scale, 2.2));
       z-index: 10000;
+    }
+
+    .cat-pet-container.catch-stretch {
+      animation: catchStretch 0.6s ease-in-out;
+    }
+
+    @keyframes catchStretch {
+      0% { transform: scaleX(1) scaleY(1); }
+      30% { transform: scaleX(1.2) scaleY(0.85); }
+      60% { transform: scaleX(0.95) scaleY(1.1); }
+      100% { transform: scaleX(1) scaleY(1); }
     }
 
     .cat-speech {
@@ -455,14 +470,15 @@
       50% { opacity: 1; transform: translateX(-50%) scaleY(1.4); }
     }
 
+    /* ===== HEART SHAPE – NOW ABOVE THE CAT'S HEAD ===== */
     .heart-shape {
       position: absolute;
-      bottom: clamp(12px, 3vw, 20px);
+      top: -70px;
       left: 50%;
       transform: translateX(-50%) scale(0);
-      width: clamp(60px, 18vw, 90px);
-      height: clamp(54px, 16vw, 80px);
-      z-index: 40;
+      width: clamp(50px, 15vw, 75px);
+      height: clamp(45px, 13vw, 68px);
+      z-index: 50;
       opacity: 0;
       pointer-events: none;
       cursor: pointer;
@@ -2808,6 +2824,18 @@
       }
     }
 
+    .cat-catching {
+      position: fixed !important;
+      z-index: 1000002 !important;
+      pointer-events: none !important;
+    }
+
+    .video-being-caught {
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      z-index: 1000001 !important;
+      pointer-events: none !important;
+    }
+
     @media (max-width: 1024px) {
       .cat-pet-container.big { --cat-big-scale: 2; }
     }
@@ -2936,6 +2964,7 @@
         <div class="gift-body"></div>
       </div>
 
+      <!-- HEART SHAPE – NOW ABOVE THE CAT'S HEAD -->
       <div class="heart-shape" id="heartShape">
         <div class="heart-hint" id="heartHint">💖 Нажми на меня 💖</div>
         <div class="heart-pulse-ring"></div>
@@ -3021,15 +3050,16 @@
 
       <div class="letter-heart-top">💖</div>
       <div class="letter-to">Дорогая Карина,</div>
-      <div class="letter-title">Короткое письмо от сердца</div>
+      <div class="letter-title">Прощай, моя мечта</div>
       <div class="letter-divider">❦ ❦ ❦</div>
       <div class="letter-body">
-        <p>Спасибо тебе за всё. За разговоры, за смех, за моменты, которые я буду бережно хранить. Ты сделала мои дни светлее просто тем, что была рядом — пусть даже на расстоянии.</p>
-        <p>Прости меня за ошибки и за боль, которую я мог тебе причинить. Я никогда не хотел этого. Я всегда хотел только одного — чтобы ты была <span class="love-word">счастлива.</span></p>
-        <p>И если однажды судьба снова сведёт нас, я просто улыбнусь и скажу: <span class="love-word">спасибо.</span> Спасибо за то, что ты была в моей жизни.</p>
-        <p>Береги себя, Карина. Ты заслуживаешь всего самого лучшего. 💚</p>
+        <p>Это короткое письмо. Просто хочу сказать: <span class="love-word">спасибо</span> за всё.</p>
+        <p>Спасибо за разговоры, за смех, за моменты, которые я буду хранить вечно. Ты сделала мои дни светлее просто тем, что была рядом.</p>
+        <p>Прости меня за ошибки и за боль, которую я мог причинить. Я никогда не хотел этого. Я всегда хотел только одного — чтобы ты была <span class="love-word">счастлива.</span></p>
+        <p>Это моё последнее сообщение тебе. <span class="love-word">Прощай, Карина.</span></p>
+        <p>Береги себя. Ты заслуживаешь всего самого лучшего. 💚</p>
       </div>
-      <div class="letter-signature">С теплом и благодарностью 💚</div>
+      <div class="letter-signature">С любовью,<br>Ken Laurence Baby 💚</div>
       <div class="letter-heart-bottom">💖 💕 💖</div>
       <div class="wax-seal">💌</div>
     </div>
@@ -3141,6 +3171,7 @@
       let giftOpened = false;
       let heartModeActive = false;
       let isBig = false;
+      let isCatCatching = false;
 
       const activeVideos = new Map();
 
@@ -3490,8 +3521,171 @@
         }, 1200);
       }
 
-      // ===== UPDATED: closeLightbox now removes the specific memory completely =====
-      function closeLightbox() {
+      function catCatchAndReturn(videoEl, index) {
+        if (isCatCatching) {
+          sendSingleVideoHomeDirect(index);
+          return;
+        }
+        isCatCatching = true;
+
+        const entry = activeVideos.get(index);
+        if (!entry) {
+          isCatCatching = false;
+          return;
+        }
+
+        if (entry.cancelFlight) entry.cancelFlight();
+        videoEl.classList.remove('returning');
+
+        const videoRect = videoEl.getBoundingClientRect();
+        const videoCenterX = videoRect.left + videoRect.width / 2;
+        const videoCenterY = videoRect.top + videoRect.height / 2;
+
+        const giftRect = giftBox.getBoundingClientRect();
+        const giftCenterX = giftRect.left + giftRect.width / 2;
+        const giftCenterY = giftRect.top + giftRect.height / 2;
+
+        const catRect = walker.getBoundingClientRect();
+        const catWidth = catRect.width;
+        const catHeight = catRect.height;
+
+        const centerX = window.innerWidth / 2 - catWidth / 2;
+        const centerY = window.innerHeight / 2 - catHeight / 2;
+
+        videoEl.style.transition = 'none';
+        videoEl.style.left = videoRect.left + 'px';
+        videoEl.style.top = videoRect.top + 'px';
+        videoEl.style.transform = 'scale(1) rotate(0deg)';
+        videoEl.style.transformOrigin = 'center center';
+        videoEl.style.zIndex = '1000001';
+        videoEl.classList.add('video-being-caught');
+
+        walker.classList.add('cat-catching');
+        walker.style.transition = 'left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        walker.style.left = (videoCenterX - catWidth / 2) + 'px';
+        walker.style.top = (videoCenterY - catHeight / 2) + 'px';
+
+        speech.classList.add('show');
+        speech.innerHTML = '💚 Я ПОЙМАЮ ЭТО<br><span class="highlight">ВОСПОМИНАНИЕ</span>! 🐾<br>ДЕРЖИСЬ! ✨';
+
+        setTimeout(function() {
+          pet.classList.add('catch-stretch');
+
+          videoEl.style.transition = 'all 0.3s ease-out';
+          videoEl.style.transform = 'scale(0.6) rotate(15deg)';
+          videoEl.style.opacity = '0.9';
+
+          speech.innerHTML = '🐾 ПОЙМАЛ! 💚<br>НЕСУ ЭТО ОБРАТНО<br>В <span class="highlight">КОРОБКУ</span>! 🎁';
+
+          setTimeout(function() {
+            walker.style.transition = 'left 1s cubic-bezier(0.34, 1.56, 0.64, 1), top 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            walker.style.left = (giftCenterX - catWidth / 2) + 'px';
+            walker.style.top = (giftCenterY - catHeight / 2) + 'px';
+
+            videoEl.style.transition = 'all 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            videoEl.style.left = (giftCenterX - 30) + 'px';
+            videoEl.style.top = (giftCenterY - 30) + 'px';
+            videoEl.style.transform = 'scale(0.2) rotate(720deg)';
+            videoEl.style.opacity = '0.5';
+
+            setTimeout(function() {
+              giftBox.classList.add('receiving');
+
+              videoEl.style.transition = 'all 0.5s ease-in';
+              videoEl.style.transform = 'scale(0) rotate(1080deg)';
+              videoEl.style.opacity = '0';
+
+              speech.innerHTML = '💚 ВОСПОМИНАНИЕ В БЕЗОПАСНОСТИ!<br><span class="highlight">ВСЁ В ПОРЯДКЕ</span>! 🎁✨';
+
+              setTimeout(function() {
+                if (videoEl.parentNode) {
+                  videoEl.parentNode.removeChild(videoEl);
+                }
+                activeVideos.delete(index);
+
+                giftBox.classList.remove('receiving');
+                pet.classList.remove('catch-stretch');
+
+                walker.classList.add('impact');
+                setTimeout(function() { walker.classList.remove('impact'); }, 500);
+
+                walker.style.transition = 'left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                walker.style.left = centerX + 'px';
+                walker.style.top = centerY + 'px';
+
+                speech.innerHTML = '💚 ОБРАТНО В<br><span class="highlight">ЦЕНТР</span>! 🐾<br>ВСЁ В ПОРЯДКЕ! ✨';
+
+                setTimeout(function() {
+                  walker.classList.remove('cat-catching');
+                  walker.style.transition = '';
+                  walker.style.left = '50%';
+                  walker.style.top = '50%';
+                  walker.style.transform = 'translate(-50%, -50%)';
+
+                  startDancing();
+
+                  if (activeVideos.size > 0) {
+                    speech.innerHTML = '💚 ВОСПОМИНАНИЕ В БЕЗОПАСНОСТИ!<br><span class="highlight">НАЖМИ НА ДРУГОЕ</span><br>ВИДЕО 📽️✨';
+
+                    setTimeout(function() {
+                      if (!heartModeActive) {
+                        speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
+                      }
+                    }, 3500);
+                  } else {
+                    speech.innerHTML = '💚 ВСЕ ВОСПОМИНАНИЯ<br>В БЕЗОПАСНОСТИ!<br><span class="highlight">СМОТРИ, ЧТО БУДЕТ</span> ✨🎁';
+
+                    setTimeout(function() {
+                      transformBoxIntoHeart();
+                    }, 2500);
+                  }
+
+                  isCatCatching = false;
+                }, 1300);
+              }, 500);
+            }, 1000);
+          }, 400);
+        }, 900);
+      }
+
+      function sendSingleVideoHomeDirect(index) {
+        const entry = activeVideos.get(index);
+        if (!entry) return;
+
+        const videoEl = entry.el;
+        if (entry.cancelFlight) entry.cancelFlight();
+        videoEl.classList.add('returning');
+
+        const giftRect = giftBox.getBoundingClientRect();
+        const giftCenterX = giftRect.left + giftRect.width / 2;
+        const giftCenterY = giftRect.top + giftRect.height / 2;
+
+        videoEl.style.transition = 'none';
+        videoEl.style.transform = 'translate(0, 0) scale(1) rotate(0deg)';
+        videoEl.style.opacity = '1';
+        void videoEl.offsetWidth;
+
+        videoEl.style.transition = 'left 1.2s cubic-bezier(0.5, 0, 0.75, 0), top 1.2s cubic-bezier(0.5, 0, 0.75, 0), transform 1.2s cubic-bezier(0.5, 0, 0.75, 0), opacity 1.2s ease-in 0.7s';
+        videoEl.style.left = (giftCenterX - 20) + 'px';
+        videoEl.style.top = (giftCenterY - 20) + 'px';
+        videoEl.style.transform = 'translate(0, 0) scale(0.05) rotate(720deg)';
+        videoEl.style.opacity = '0';
+
+        setTimeout(function() {
+          if (videoEl.parentNode) {
+            videoEl.parentNode.removeChild(videoEl);
+          }
+          activeVideos.delete(index);
+
+          if (activeVideos.size === 0 && !heartModeActive && giftOpened) {
+            setTimeout(function() {
+              transformBoxIntoHeart();
+            }, 1500);
+          }
+        }, 1400);
+      }
+
+      function closeLightbox(sendHome) {
         lightbox.classList.remove('open');
         setTimeout(function() {
           lightboxVideo.pause();
@@ -3500,46 +3694,25 @@
           lightboxImage.removeAttribute('src');
         }, 400);
 
-        if (currentLightboxIndex >= 0) {
+        if (sendHome && currentLightboxIndex >= 0) {
           const entry = activeVideos.get(currentLightboxIndex);
           if (entry) {
-            const videoEl = entry.el;
-            if (entry.cancelFlight) entry.cancelFlight();
-            videoEl.classList.add('dissolving');
-            videoEl.style.transition = 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            videoEl.style.opacity = '0';
-            videoEl.style.transform = 'scale(0.2) rotate(360deg) translateY(-80px)';
-            videoEl.style.pointerEvents = 'none';
-
-            setTimeout(function() {
-              if (videoEl.parentNode) {
-                videoEl.parentNode.removeChild(videoEl);
-              }
-              activeVideos.delete(currentLightboxIndex);
-
-              // If all memories are gone, transform box into heart
-              if (activeVideos.size === 0 && !heartModeActive && giftOpened) {
-                setTimeout(function() {
-                  transformBoxIntoHeart();
-                }, 1200);
-              }
-            }, 900);
+            catCatchAndReturn(entry.el, currentLightboxIndex);
+          }
+        } else {
+          if (!heartModeActive) {
+            if (!window._remindInterval) {
+              window._remindInterval = setInterval(function() {
+                if (lightbox.classList.contains('open')) return;
+                if (heartModeActive) return;
+                if (!speech.classList.contains('show')) {
+                  speech.classList.add('show');
+                }
+                speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
+              }, 8000);
+            }
           }
         }
-
-        if (!heartModeActive && activeVideos.size > 0) {
-          if (!window._remindInterval) {
-            window._remindInterval = setInterval(function() {
-              if (lightbox.classList.contains('open')) return;
-              if (heartModeActive) return;
-              if (!speech.classList.contains('show')) {
-                speech.classList.add('show');
-              }
-              speech.innerHTML = 'ПОЖАЛУЙСТА <span class="highlight">НАЖМИ НА КАЖДОЕ ВИДЕО</span><br>ЧТОБЫ ПОСМОТРЕТЬ<br><span class="highlight">ВОСПОМИНАНИЯ</span> 💚📽️✨';
-            }, 8000);
-          }
-        }
-
         currentLightboxIndex = -1;
       }
 
@@ -3851,7 +4024,7 @@
 
       lightboxClose.addEventListener('click', function(e) {
         e.stopPropagation();
-        closeLightbox();
+        closeLightbox(true);
       });
       lightboxPrev.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -3862,7 +4035,7 @@
         showNextVideo();
       });
       lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) closeLightbox();
+        if (e.target === lightbox) closeLightbox(true);
       });
 
       bookClose.addEventListener('click', function(e) {
@@ -3903,7 +4076,7 @@
         if (loveLetterModal.classList.contains('open')) {
           if (e.key === 'Escape') closeLoveLetter();
         } else if (lightbox.classList.contains('open')) {
-          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'Escape') closeLightbox(true);
           if (e.key === 'ArrowRight') showNextVideo();
           if (e.key === 'ArrowLeft') showPrevVideo();
         } else if (storybookOverlay.classList.contains('open')) {
@@ -4065,7 +4238,7 @@
         });
 
         setTimeout(function() {
-          if (videoEl.classList.contains('returning') || videoEl.classList.contains('dissolving')) return;
+          if (videoEl.classList.contains('returning') || videoEl.classList.contains('video-being-caught')) return;
 
           const rect = videoEl.getBoundingClientRect();
           videoEl.style.transition = 'none';
@@ -4090,7 +4263,7 @@
           function flyLoop(now) {
             if (!running) return;
             if (videoEl.classList.contains('returning')) return;
-            if (videoEl.classList.contains('dissolving')) return;
+            if (videoEl.classList.contains('video-being-caught')) return;
 
             const elapsed = (now - startTime) / 1000;
             const t = elapsed / flyDuration * Math.PI * 2;
